@@ -1,0 +1,85 @@
+<!--
+ゲームパッド操作サンプルのlaunch
+
+rosserialを使ってROSとメカナムローバーを接続し、PCにゲームパッドを接続してから起動してください。
+
+起動コマンド：roslaunch mecanumrover3_ros joycon.launch
+ -->
+
+<launch>
+  <!-- 引数 -->
+  <arg name="rover_type"  default="mecanum3"  doc="mecanum3" />
+  <arg name="lrf"         default="urg"       doc="urg / tg30"/>
+
+  <!-- オドメトリの配信ノード -->
+  <node pkg="mecanumrover3_ros" type="pub_odom" name="pub_odom" />
+
+  <!-- URG-04LX-UG01の場合 -->
+  <group if="$(eval lrf=='urg')">
+　　<!-- LRFのデバイスファイルパス -->
+　　<arg name="port_urg" default="/dev/ttyACM0" /> <!-- LRFのデバイスファイルパスを設定してください -->
+
+　　<!-- メカナムローバーの旋回中心からLRFまでの座標変換の設定 -->
+    <group if="$(eval rover_type=='mecanum3')">
+　　  <!-- メカナムローバーVer.3.0の場合 -->
+      <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.189 0 0.221 0 0 0 base_link lidar_link 1" />
+    </group>
+
+
+　　<!-- LRFのデバイスドライバノード -->
+　　<node pkg="urg_node" type="urg_node" name="urg_node">
+       <param name="serial_port" value="$(arg port_urg)" />
+       <param name="frame_id" value="lidar_link" />
+       <param name="angle_min" value="-1.57" /> <!-- 視野角の指定（最小値） -->
+       <param name="angle_max" value="1.57" />  <!-- 視野角の指定（最大値） -->
+　　</node>
+  </group>
+
+  <!-- YDLiDAR TG30の場合 -->
+  <group if="$(eval lrf=='tg30')">
+    <!-- メカナムローバーの旋回中心からLRFまでの座標変換の設定 -->
+    <group if="$(eval rover_type=='mecanum3')">
+　　  <!-- メカナムローバーVer3.0の場合 -->
+      <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.203 0 0.196 0 0 0 base_link lidar_link 1" />
+    </group>
+
+    <!-- YDLiDARデバイスドライバノード-->
+    <node name="ydlidar_node"  pkg="ydlidar_ros"  type="ydlidar_node" output="screen" respawn="false" >
+      <param name="port"         type="string" value="/dev/ydlidar"/>  <!-- LRFのデバイスファイルパス -->
+      <param name="baudrate"         type="int" value="512000"/>  
+      <param name="frame_id"     type="string" value="lidar_link"/>
+      <param name="resolution_fixed"    type="bool"   value="true"/>
+      <param name="auto_reconnect"    type="bool"   value="true"/>
+      <param name="reversion"    type="bool"   value="true"/>
+      <param name="angle_min"    type="double" value="-180" />  <!-- センサの正面を0度する視野角の指定（最小値） -->
+      <param name="angle_max"    type="double" value="180" />   <!-- センサの正面を0度する視野角の指定（最大値） -->
+      <param name="range_min"    type="double" value="0.01" />
+      <param name="range_max"    type="double" value="32.0" />
+      <param name="ignore_array" type="string" value="" />
+      <param name="frequency"    type="double" value="10"/>
+      <param name="samp_rate"    type="int"    value="20"/>
+      <param name="isTOFLidar"    type="bool"   value="true"/>
+    </node>
+
+  </group>
+
+  <!-- joy node -->
+  <node pkg="joy" type="joy_node" name="mecanumrover_joy" respawn="true" >
+    <param name="dev" type="string" value="/dev/input/js0" /> <!-- デバイスファイルパスを正しく設定してください -->
+    <param name="deadzone" value="0.05"/>
+  </node>
+
+  <!-- joycon -->
+  <node pkg="mecanumrover3_ros" type="joycon" name="joycon" respawn="true">
+    <param name="axis_linear" value="1" />
+    <param name="axis_angular" value="0" />
+    <param name="scale_linear" value="0.6" />
+    <param name="scale_angular" value="0.8" />
+    <param name="safety_button" value="2" />
+  </node>
+   
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mecanumrover3_ros)/configuration_files/rviz/joycon_urg.rviz"/>
+
+</launch>
