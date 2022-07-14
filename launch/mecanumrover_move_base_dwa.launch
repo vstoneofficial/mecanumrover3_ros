@@ -8,6 +8,7 @@
   <!-- 引数 -->
   <arg name="rover_type"  default="mecanum3"  doc="mecanum3" />
   <arg name="lrf"         default="tg30"       doc="urg / tg30"/>
+  <arg name="rviz"        default="on"     doc="on / off"/>
 
   <!-- オドメトリの配信ノード -->
   <node pkg="mecanumrover3_ros" type="pub_odom" name="pub_odom" />
@@ -22,7 +23,7 @@
     <group if="$(eval rover_type=='mecanum3')">
 　　  <!-- メカナムローバーVer.3.0の場合 -->
       <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.1 0 0.08 0 0 3.14159 base_link lidar_link 1" />
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.1 0 0.08 0 0 3.14159 base_footprint lidar_link 1" />
     </group>
 
 　　<!-- LRFのデバイスドライバノード -->
@@ -40,7 +41,7 @@
     <group if="$(eval rover_type=='mecanum3')">
 　　  <!-- メカナムローバーVer.3.0の場合 -->
       <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.12 0 0.08 0 0 0 base_link lidar_link 1" />
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.203 0 0.196 0 0 0 base_footprint lidar_link 1" />
     </group>
 
     <!-- YDLiDARデバイスドライバノード-->
@@ -118,7 +119,7 @@
     <param name="update_min_d" value="0.05"/>
     <param name="update_min_a" value="0.03"/>
     <param name="odom_frame_id" value="odom"/>
-    <param name="base_frame_id" value="base_link" />
+    <param name="base_frame_id" value="base_footprint" />
     <param name="resample_interval" value="1"/>
     <param name="transform_tolerance" value="0.2"/>
     <param name="recovery_alpha_slow" value="0.001"/>
@@ -136,7 +137,9 @@
     <rosparam file="$(find mecanumrover3_ros)/configuration_files/mecanumrover_move_base_params.yaml" command="load" />
   </node>
 
-  <!-- Rviz -->
-  <node pkg="rviz" type="rviz" args="-d '$(find mecanumrover3_ros)/configuration_files/rviz/navigation.rviz'" name="visualizer" respawn="true" />
+    <!-- rviz(視覚化ツール) -->
+  <group if="$(eval rviz=='on')">
+    <node pkg="rviz" type="rviz" args="-d '$(find mecanumrover3_ros)/configuration_files/rviz/navigation.rviz'" name="visualizer" respawn="true" />
+  </group>
 </launch>
 
