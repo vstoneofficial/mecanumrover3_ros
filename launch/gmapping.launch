@@ -93,6 +93,7 @@ SLAM（gmapping）サンプルのlaunch
     <param name="ymax" value="30" type="double" />
     <param name="xmin" value="-30" type="double" />
     <param name="ymin" value="-30" type="double" />
+    <param name="base_frame" value="base_footprint" type="string" />
   </node>
 
     <!-- rviz(視覚化ツール) -->
