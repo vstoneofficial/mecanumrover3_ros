@@ -28,7 +28,8 @@ int main(int argc, char** argv){
   tf::TransformBroadcaster odom_broadcaster;
 
   //get params
-  ros::param::param<double>("odom_kv", odom_kv, 1.0);
+  ros::param::param<double>("odom_kvx", odom_kvx, 1.0);
+  ros::param::param<double>("odom_kvy", odom_kvy, 1.0);
   ros::param::param<double>("odom_kth", odom_kth, 1.0);    
 
   double x = 0.0;
