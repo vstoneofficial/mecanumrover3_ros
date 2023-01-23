@@ -1,7 +1,8 @@
 # costmap common params for MEGAROVER
 
 # ロボットの大きさに関するパラメータ
-footprint: [[0.2, -0.15], [0.2, 0.15], [-0.2, 0.15], [-0.2, -0.15]]
+footprint: [[0.2, -0.15], [0.2, 0.15], [-0.2, 0.15], [-0.2, -0.15]]  # mecanum ver.3.0
+# footprint: [[0.29, -0.22], [0.29, 0.22], [-0.29, 0.22], [-0.29, -0.22]]  # g120a
 
 #obstacle_layerの設定
 obstacle_layer:

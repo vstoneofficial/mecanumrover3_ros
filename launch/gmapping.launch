@@ -11,7 +11,7 @@ SLAM（gmapping）サンプルのlaunch
 <launch>
 
   <!-- 引数 -->
-  <arg name="rover_type"  default="mecanum3"  doc="mecanum3" />
+  <arg name="rover_type"  default="mecanum3"  doc="mecanum3 / g120a" />
   <arg name="lrf"         default="tg30"       doc="urg / tg30"/>
   <arg name="rviz"        default="on"     doc="on / off"/>
 
@@ -46,6 +46,12 @@ SLAM（gmapping）サンプルのlaunch
 　　  <!-- メカナムローバーVer3.0の場合 -->
       <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
       <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.203 0 0.196 0 0 0 base_footprint lidar_link 1" />
+    </group>
+
+    <group if="$(eval rover_type=='g120a')">
+　　  <!-- メカナムローバーG120Aの場合 -->
+      <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.293 0 0.211 0 0 0 base_footprint lidar_link 1" />
     </group>
 
     <!-- YDLiDARデバイスドライバノード-->
