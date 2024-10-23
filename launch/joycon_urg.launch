@@ -8,7 +8,7 @@ rosserialを使ってROSとメカナムローバーを接続し、PCにゲーム
 
 <launch>
   <!-- 引数 -->
-  <arg name="rover_type"  default="mecanum3"  doc="mecanum3" />
+  <arg name="rover_type"  default="mecanum3"  doc="mecanum3 / g120a" />
   <arg name="lrf"         default="urg"       doc="urg / tg30"/>
 
   <!-- オドメトリの配信ノード -->
@@ -16,33 +16,43 @@ rosserialを使ってROSとメカナムローバーを接続し、PCにゲーム
 
   <!-- URG-04LX-UG01の場合 -->
   <group if="$(eval lrf=='urg')">
-　　<!-- LRFのデバイスファイルパス -->
-　　<arg name="port_urg" default="/dev/ttyACM0" /> <!-- LRFのデバイスファイルパスを設定してください -->
+    <!-- LRFのデバイスファイルパス -->
+    <arg name="port_urg" default="/dev/ttyACM0" /> <!-- LRFのデバイスファイルパスを設定してください -->
 
-　　<!-- メカナムローバーの旋回中心からLRFまでの座標変換の設定 -->
+    <!-- メカナムローバーVer.3.0の旋回中心からLRFまでの座標変換の設定 -->
     <group if="$(eval rover_type=='mecanum3')">
-　　  <!-- メカナムローバーVer.3.0の場合 -->
+      <!-- メカナムローバーVer.3.0の場合 -->
       <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.189 0 0.221 0 0 0 base_footprint lidar_link 1" />
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.189 0 0.23 0 0 0 base_footprint lidar_link 1" />
+    </group>
+    <group if="$(eval rover_type=='g120a')">
+      <!-- メカナムローバーG120Aの場合 -->
+      <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.28 0 0.273 0 0 3.14159 base_footprint lidar_link 1" />
     </group>
 
 
-　　<!-- LRFのデバイスドライバノード -->
-　　<node pkg="urg_node" type="urg_node" name="urg_node">
+    <!-- LRFのデバイスドライバノード -->
+    <node pkg="urg_node" type="urg_node" name="urg_node">
        <param name="serial_port" value="$(arg port_urg)" />
        <param name="frame_id" value="lidar_link" />
        <param name="angle_min" value="-1.57" /> <!-- 視野角の指定（最小値） -->
        <param name="angle_max" value="1.57" />  <!-- 視野角の指定（最大値） -->
-　　</node>
+    </node>
   </group>
 
   <!-- YDLiDAR TG30の場合 -->
   <group if="$(eval lrf=='tg30')">
     <!-- メカナムローバーの旋回中心からLRFまでの座標変換の設定 -->
     <group if="$(eval rover_type=='mecanum3')">
-　　  <!-- メカナムローバーVer3.0の場合 -->
+      <!-- メカナムローバーVer.3.0の場合 -->
       <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.203 0 0.196 0 0 0 base_footprint lidar_link 1" />
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.203 0 0.198 0 0 0 base_footprint lidar_link 1" />
+    </group>
+    <group if="$(eval rover_type=='g120a')">
+      <!-- メカナムローバーG120Aの場合 -->
+      <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" -->
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.28 0 0.273 0 0 3.14159 base_footprint lidar_link 1" />
     </group>
 
     <!-- YDLiDARデバイスドライバノード-->
@@ -73,11 +83,12 @@ rosserialを使ってROSとメカナムローバーを接続し、PCにゲーム
 
   <!-- joycon -->
   <node pkg="mecanumrover3_ros" type="joycon" name="joycon" respawn="true">
-    <param name="axis_linear" value="1" />
-    <param name="axis_angular" value="0" />
+    <param name="axis_linear_x" value="1" />
+    <param name="axis_linear_y" value="0" />
+    <param name="axis_angular" value="3" />
     <param name="scale_linear" value="0.6" />
     <param name="scale_angular" value="0.8" />
-    <param name="safety_button" value="2" />
+    <param name="safety_button" value="7" />
   </node>
    
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mecanumrover3_ros)/configuration_files/rviz/joycon_urg.rviz"/>
